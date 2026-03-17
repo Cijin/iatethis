@@ -1,11 +1,12 @@
 const std = @import("std");
 const sdl = @import("sdl3").c;
 const calories = @import("calories.zig");
-// Docs: https://7games.codeberg.page/zig-sdl3/@docs/#sdl3.render
 
 const Width = 640;
 const Height = 480;
 
+// Note:
+// SDL_Wiki: https://wiki.libsdl.org/SDL3/FrontPage
 pub fn main() !void {
     var window: *sdl.SDL_Window = undefined;
     var renderer: *sdl.SDL_Renderer = undefined;
