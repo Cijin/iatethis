@@ -21,5 +21,16 @@ pub fn getCalories() !void {
     var iterator = calories_dir.iterate();
     while (try iterator.next()) |entry| {
         std.debug.print("{s}\n", .{entry.name});
+        // Todo:
+        // Read the file inside this dir if it's a *.txt file
+        // There is only one at the moment so just read that one
+        // Get start_date, end_date, calories for the week
+        // If current week has less than 7 values show projected
+        // based on last week's calories for those days.
+        //
+        // Later I can do some maths to put weight and select gain or loose
+        // and it will show me a breakdown of how many calories I should eat
+        // per day. But based on my preference of eating more calories on
+        // alternate days.
     }
 }
