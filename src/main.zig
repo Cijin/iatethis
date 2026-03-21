@@ -8,6 +8,10 @@ const Height = 480;
 // Note:
 // SDL_Wiki: https://wiki.libsdl.org/SDL3/FrontPage
 pub fn main() !void {
+    var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    defer arena.deinit();
+
+    const alloc = arena.allocator();
     var window: *sdl.SDL_Window = undefined;
     var renderer: *sdl.SDL_Renderer = undefined;
 
@@ -26,10 +30,44 @@ pub fn main() !void {
         return error.SDLWindow;
     }
 
-    errdefer sdl.SDL_DestroyWindow(window);
-    errdefer sdl.SDL_DestroyRenderer(renderer);
+    if (!sdl.TTF_Init()) {
+        sdl.SDL_Log("Couldn't init ttf: %s", sdl.SDL_GetError());
+        return error.TTFInitFailed;
+    }
 
-    try calories.getCalories();
+    defer {
+        sdl.SDL_DestroyWindow(window);
+        sdl.SDL_DestroyRenderer(renderer);
+        sdl.TTF_Quit();
+        sdl.SDL_Quit();
+    }
+
+    // Fix: maxInt(i32) is too big? Not sure. Need to check how people do this.
+    const font_ttf = try std.fs.cwd().readFileAlloc(alloc, "font/font.ttf", std.math.maxInt(i32));
+    const font = sdl.TTF_OpenFontIO(sdl.SDL_IOFromConstMem(font_ttf.ptr, font_ttf.len), true, 18.0);
+    if (font == null) {
+        sdl.SDL_Log("Could not open font file: %s", sdl.SDL_GetError());
+        return error.FontFailed;
+    }
+    defer sdl.TTF_CloseFont(font);
+
+    const engine = sdl.TTF_CreateRendererTextEngine(renderer);
+    if (engine == null) {
+        sdl.SDL_Log("Failed to create text engine: %s", sdl.SDL_GetError());
+        return error.TextEngineFialed;
+    }
+
+    const hello = "Hello World!\n";
+    const text = sdl.TTF_CreateText(engine, font.?, hello.ptr, hello.len);
+    if (text == null) {
+        sdl.SDL_Log("Failed to create text: %s", sdl.SDL_GetError());
+        return error.TextFailed;
+    }
+
+    if (!sdl.TTF_SetTextColor(text, 0xff, 0xff, 0xff, 0xff)) {
+        sdl.SDL_Log("Failed to set text color: %s", sdl.SDL_GetError());
+        return error.TextColorFailed;
+    }
 
     var quit = false;
     var event: sdl.SDL_Event = undefined;
@@ -55,16 +93,8 @@ pub fn main() !void {
         _ = sdl.SDL_SetRenderDrawColor(renderer, 0x18, 0x18, 0x18, 0xff);
         _ = sdl.SDL_RenderClear(renderer);
 
-        var rect = sdl.struct_SDL_FRect{
-            .w = Width / 10,
-            .h = Height / 10,
-        };
-        rect.x = (Width - rect.w) / 2;
-        rect.y = (Height - rect.h) / 2;
-        _ = sdl.SDL_SetRenderDrawColor(renderer, 0xff, 0, 0, 0xff);
-        _ = sdl.SDL_RenderFillRect(renderer, @ptrCast(&rect));
+        _ = sdl.TTF_DrawRendererText(text, 200, 200);
         _ = sdl.SDL_RenderPresent(renderer);
     }
 
-    sdl.SDL_Quit();
 }
