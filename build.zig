@@ -54,7 +54,6 @@ pub fn build(b: *std.Build) void {
     });
     exe.root_module.addImport("sdl3", sdl3.module("sdl3"));
 
-
     // This declares intent for the executable to be installed into the
     // install prefix when running `zig build` (i.e. when executing the default
     // step). By default the install prefix is `zig-out/` but can be overridden

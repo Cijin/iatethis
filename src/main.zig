@@ -96,5 +96,4 @@ pub fn main() !void {
         _ = sdl.TTF_DrawRendererText(text, 200, 200);
         _ = sdl.SDL_RenderPresent(renderer);
     }
-
 }
