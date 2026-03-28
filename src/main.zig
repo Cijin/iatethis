@@ -57,6 +57,8 @@ pub fn main() !void {
         return error.TextEngineFialed;
     }
 
+    // Todo: get calories and display them somehow
+
     const hello = "Hello World!\n";
     const text = sdl.TTF_CreateText(engine, font.?, hello.ptr, hello.len);
     if (text == null) {
