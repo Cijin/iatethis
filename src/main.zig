@@ -4,6 +4,9 @@ const calories = @import("calories.zig");
 
 const Width = 640;
 const Height = 480;
+const ColOneX = 10;
+const ColTwoX = 150;
+const RowY = 10;
 
 // Note:
 // SDL_Wiki: https://wiki.libsdl.org/SDL3/FrontPage
@@ -42,7 +45,7 @@ pub fn main() !void {
         sdl.SDL_Quit();
     }
 
-    // Fix: maxInt(i32) is too big? Not sure. Need to check how people do this.
+    // Todo: maxInt(i32) is too big? Not sure.
     const font_ttf = try std.fs.cwd().readFileAlloc(allocator, "font/font.ttf", std.math.maxInt(i32));
     const font = sdl.TTF_OpenFontIO(sdl.SDL_IOFromConstMem(font_ttf.ptr, font_ttf.len), true, 18.0);
     if (font == null) {
@@ -57,17 +60,8 @@ pub fn main() !void {
         return error.TextEngineFialed;
     }
 
-    const calorie_info = try calories.getCalorieInfo(allocator);
-    const text = sdl.TTF_CreateText(engine, font.?, calorie_info.ptr, calorie_info.len);
-    if (text == null) {
-        sdl.SDL_Log("Failed to create text: %s", sdl.SDL_GetError());
-        return error.TextFailed;
-    }
-
-    if (!sdl.TTF_SetTextColor(text, 0xff, 0xff, 0xff, 0xff)) {
-        sdl.SDL_Log("Failed to set text color: %s", sdl.SDL_GetError());
-        return error.TextColorFailed;
-    }
+    // Todo: render calorie info to window
+    //const calories = try calories.getCalories(allocator);
 
     var quit = false;
     var event: sdl.SDL_Event = undefined;
@@ -93,7 +87,6 @@ pub fn main() !void {
         _ = sdl.SDL_SetRenderDrawColor(renderer, 0x18, 0x18, 0x18, 0xff);
         _ = sdl.SDL_RenderClear(renderer);
 
-        _ = sdl.TTF_DrawRendererText(text, 10, 10);
         _ = sdl.SDL_RenderPresent(renderer);
     }
 }
